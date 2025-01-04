@@ -12,6 +12,12 @@ class Stock(models.Model):
     def __str__(self):
         return self.symbol
 
+    def is_to_buy(self):
+        return self.price <= self.lower_limit
+    
+    def is_to_sell(self):
+        return self.price >= self.upper_limit
+
 class StockHistory(models.Model):
     stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
     price = models.FloatField()

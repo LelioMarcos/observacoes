@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate
 from django.core.serializers import serialize
 
 import json
-from .models import Stock
+from .models import Stock, StockHistory
 
 from django.views.decorators.csrf import csrf_exempt
 
@@ -34,8 +34,9 @@ def create_stock(request):
         price = api_b3.get_stock_price(symbol)
         print(price)
 
-        stock = Stock(user=user, symbol=symbol, price=price, upper_limit=upper_limit, lower_limit=lower_limit)
-        stock.save()
+        Stock.objects.create(user=user, symbol=symbol, price=price, upper_limit=upper_limit, lower_limit=lower_limit)
+        StockHistory.objects.create(stock=stock, price=price)
+
 
         return JsonResponse({'message': 'Stock created successfully!'})
 
