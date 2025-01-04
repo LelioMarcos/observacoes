@@ -16,7 +16,7 @@ function Home() {
         setStock(response.data.result.reverse());
       });
     }
-
+    
     useEffect(() => {
       fetchStocks()
     }, []);
@@ -34,7 +34,9 @@ function Home() {
       }, {
 
       }).then(() => {
-        fetchStocks();
+        axios.get(`http://127.0.0.1:8000/stock/get/${values.symbol}`).then((response) => {
+          setStock([response.data.result, ...stocks]);
+        });
         setLoadingAdd(false);
       }).catch((error) => {
         console.log(error)
