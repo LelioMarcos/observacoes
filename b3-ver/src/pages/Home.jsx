@@ -9,6 +9,7 @@ import axios from 'axios';
 
 function Home() {
     const [stocks, setStock] = useState([]); 
+    const [loadingAdd, setLoadingAdd] = useState(false);
 
     const fetchStocks = () => {
       axios.get("http://127.0.0.1:8000/stock/get").then((response) => {
@@ -25,6 +26,7 @@ function Home() {
     })
 
     const handleSubmit = (values) => {
+      setLoadingAdd(true);
       axios.post("http://127.0.0.1:8000/stock/add/", {
         symbol: values.symbol,
         upper_limit: values.upper,
@@ -33,6 +35,7 @@ function Home() {
 
       }).then(() => {
         fetchStocks();
+        setLoadingAdd(false);
       }).catch((error) => {
         console.log(error)
       });
@@ -95,7 +98,7 @@ function Home() {
             />
           </SimpleGrid>
           <Group justify="flex-end" mt="md">
-            <Button type="submit">Adicionar</Button>
+            <Button type="submit" loading={loadingAdd}>Adicionar</Button>
           </Group>
         </form>
         </Center>
