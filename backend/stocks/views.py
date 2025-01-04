@@ -39,12 +39,22 @@ def create_stock(request):
 
         return JsonResponse({'message': 'Stock created successfully!'})
 
-def get_stock(request):
+def get_stocks(request):
     user = authenticate(username='lelio', password=dummy_password)
 
     if request.method == 'GET':
         stocks = Stock.objects.filter(user=user).values('symbol', 'price', 'upper_limit', 'lower_limit')
-        return JsonResponse({'results': list(stocks)})
+        return JsonResponse({'result': list(stocks)})
+
+def get_stock(request, token):
+    user = authenticate(username='lelio', password=dummy_password)
+
+    stock = Stock.objects.filter(user=user, symbol=token).values('symbol', 'price', 'upper_limit', 'lower_limit')
+    
+    if not stock:
+        return HttpResponse(status=404)
+
+    return JsonResponse({'result': list(stock)[0]})
 
 
 @csrf_exempt

@@ -13,7 +13,7 @@ function Home() {
 
     const fetchStocks = () => {
       axios.get("http://127.0.0.1:8000/stock/get").then((response) => {
-        setStock(response.data.results.reverse());
+        setStock(response.data.result.reverse());
       });
     }
 
