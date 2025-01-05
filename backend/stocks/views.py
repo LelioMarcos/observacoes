@@ -2,18 +2,13 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from . import api_b3
 from django.core.serializers import serialize
-
 import json
 from .models import Stock, StockHistory
-
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
-
 import os
 from dotenv import load_dotenv
-
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-
 import jwt
 
 load_dotenv(".env")
@@ -42,7 +37,8 @@ def __auth_token(request):
 
 @csrf_exempt
 def create_stock(request):
-    user = authenticate(username='lelio', password=dummy_password)
+    username = __auth_token(request)['username']
+    user = User.objects.get(username=username)
 
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
@@ -69,7 +65,8 @@ def get_stocks(request):
         return JsonResponse({'result': list(stocks)})
 
 def get_stock(request, token):
-    user = authenticate(username='lelio', password=dummy_password)
+    username = __auth_token(request)['username']
+    user = User.objects.get(username=username)
 
     stock = Stock.objects.filter(user=user, symbol=token).values('symbol', 'price', 'upper_limit', 'lower_limit')
     
@@ -81,7 +78,8 @@ def get_stock(request, token):
 
 @csrf_exempt
 def update_stock(request, token):
-    user = authenticate(username='lelio', password=dummy_password)
+    username = __auth_token(request)['username']
+    user = User.objects.get(username=username)
 
     if request.method == 'PUT':
         stock = Stock.objects.get(user=user, symbol=token)
@@ -137,7 +135,8 @@ def login_get(request):
 
 @csrf_exempt
 def delete_stock(request, token):
-    user = authenticate(username='lelio', password=dummy_password)
+    username = __auth_token(request)['username']
+    user = User.objects.get(username=username)
 
     if request.method == 'DELETE':
         stock = Stock.objects.get(user=user, symbol=token)
