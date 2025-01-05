@@ -5,20 +5,22 @@ import { Link } from 'react-router-dom';
 import StockGraph from '../components/StockGraph';
 import EditableNumberInput from '../components/EditableNumberInput';
 import axios from 'axios';
-
+import { useAuth } from '../providers/AuthProvider';
 
 function Home() {
     const [stocks, setStock] = useState([]); 
     const [loadingAdd, setLoadingAdd] = useState(false);
 
+    
+    
     const fetchStocks = () => {
-      axios.get("http://127.0.0.1:8000/stock/get").then((response) => {
+      axios.get("/stock/get").then((response) => {
         setStock(response.data.result.reverse());
       });
     }
     
     const fetchOneStock = (symbol) => {
-      axios.get(`http://127.0.0.1:8000/stock/get/${symbol}`).then((response) => {
+      axios.get(`/stock/get/${symbol}`).then((response) => {
         setStock([response.data.result, ...stocks]);
       });
     }
@@ -33,7 +35,7 @@ function Home() {
 
     const handleSubmit = (values) => {
       setLoadingAdd(true);
-      axios.post("http://127.0.0.1:8000/stock/add/", {
+      axios.post("/stock/add/", {
         symbol: values.symbol,
         upper_limit: values.upper,
         lower_limit: values.lower
@@ -48,7 +50,7 @@ function Home() {
     };
 
     const updateStock = (new_stock, index) => {
-      axios.put(`http://127.0.0.1:8000/stock/update/${new_stock[index].symbol}`, {
+      axios.put(`/stock/update/${new_stock[index].symbol}`, {
         symbol: new_stock[index].symbol,
         upper_limit: new_stock[index].upper_limit,
         lower_limit: new_stock[index].lower_limit
@@ -67,7 +69,7 @@ function Home() {
     }
 
     const handleRemove = (index) => {
-      axios.delete(`http://127.0.0.1:8000/stock/delete/${stocks[index].symbol}`).then(() => {
+      axios.delete(`/stock/delete/${stocks[index].symbol}`).then(() => {
         fetchStocks();
       });
     }
