@@ -12,7 +12,7 @@ media
 .python-version 
 
 # celery 
-celerybeat-schedule.* 
+celerybeat-schedule* 
 
 # Visual Studio Code # 
 .vscode/* 
