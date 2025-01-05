@@ -34,7 +34,7 @@ def create_stock(request):
         price = api_b3.get_stock_price(symbol)
         print(price)
 
-        Stock.objects.create(user=user, symbol=symbol, price=price, upper_limit=upper_limit, lower_limit=lower_limit)
+        stock = Stock.objects.create(user=user, symbol=symbol, price=price, upper_limit=upper_limit, lower_limit=lower_limit)
         StockHistory.objects.create(stock=stock, price=price)
 
 
@@ -57,6 +57,34 @@ def get_stock(request, token):
 
     return JsonResponse({'result': list(stock)[0]})
 
+
+
+@csrf_exempt
+def update_stock(request, token):
+    user = authenticate(username='lelio', password=dummy_password)
+
+    if request.method == 'PUT':
+        stock = Stock.objects.get(user=user, symbol=token)
+
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+
+        symbol = body['symbol']
+        upper_limit = body['upper_limit']
+        lower_limit = body['lower_limit']
+
+        stock.symbol = symbol
+        stock.upper_limit = upper_limit
+        stock.lower_limit = lower_limit
+        stock.save()
+        
+        data = {
+            'symbol': stock.symbol,
+            'price': stock.price,
+            'upper_limit': stock.upper_limit,
+            'lower_limit': stock.lower_limit
+        }
+        return JsonResponse({'message': 'Update successfully!', 'result': data}) 
 
 @csrf_exempt
 def delete_stock(request, token):

@@ -26,7 +26,7 @@ function EditableNumberInput({ text, valueOri, onChangeHandler }) {
                 )}   
             <Button size="xs" onClick={() => {
                 setElement(!element)
-                onChangeHandler(value);
+                {element ? onChangeHandler(value) : <></>}
             }
 
             }>{element ?

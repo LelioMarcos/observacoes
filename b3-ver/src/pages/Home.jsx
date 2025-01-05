@@ -17,6 +17,12 @@ function Home() {
       });
     }
     
+    const fetchOneStock = (symbol) => {
+      axios.get(`http://127.0.0.1:8000/stock/get/${symbol}`).then((response) => {
+        setStock([response.data.result, ...stocks]);
+      });
+    }
+
     useEffect(() => {
       fetchStocks()
     }, []);
@@ -34,20 +40,30 @@ function Home() {
       }, {
 
       }).then(() => {
-        axios.get(`http://127.0.0.1:8000/stock/get/${values.symbol}`).then((response) => {
-          setStock([response.data.result, ...stocks]);
-        });
+        fetchOneStock(values.symbol);
         setLoadingAdd(false);
       }).catch((error) => {
         console.log(error)
       });
-
     };
 
-    const handleChangeLimits = (value, index) => {
+    const updateStock = (new_stock, index) => {
+      axios.put(`http://127.0.0.1:8000/stock/update/${new_stock[index].symbol}`, {
+        symbol: new_stock[index].symbol,
+        upper_limit: new_stock[index].upper_limit,
+        lower_limit: new_stock[index].lower_limit
+      }).then((response) => {
+        const newStocks = [...stocks];
+        newStocks[index] = response.data.result;
+        setStock(newStocks);
+      });
+    }
+
+    const handleChangeLimit = (new_value, limit, index) => {
       const newStocks = [...stocks];
-      newStocks[index].upper = value;
-      setStock(newStocks);
+      newStocks[0][limit] = new_value;
+      console.log(newStocks);
+      updateStock(newStocks, index);
     }
 
     const handleRemove = (index) => {
@@ -115,8 +131,8 @@ function Home() {
                 <StockGraph stock={stock.symbol} limSup={stock.upper_limit} limInf={stock.lower_limit}/>
                 <Divider orientation="horizontal" margins="md" />
                 <Stack>
-                  <EditableNumberInput text="Valor para venda: " valueOri={stock.upper_limit} onChangeHandler={(new_val) => handleChangeLimits(new_val, index)}/>
-                  <EditableNumberInput text="Valor para compra: " valueOri={stock.lower_limit} onChangeHandler={(new_val) => handleChangeLimits(new_val, index)}/>
+                  <EditableNumberInput text="Valor para venda: " valueOri={stock.upper_limit} onChangeHandler={(new_val) => handleChangeLimit(new_val, 'upper_limit', index)}/>
+                  <EditableNumberInput text="Valor para compra: " valueOri={stock.lower_limit} onChangeHandler={(new_val) => handleChangeLimit(new_val, 'lower_limit', index)}/>
                 </Stack>
                 <Button mt="sm" onClick={() => handleRemove(index)} variant="light" color="red">Remover</Button>
             </Card>

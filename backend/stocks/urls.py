@@ -7,5 +7,6 @@ urlpatterns = [
     path('add/', views.create_stock, name="add_stock"),
     path('get/', views.get_stocks, name="get_stocks"),
     path('get/<str:token>', views.get_stock, name="get_stock"),
+    path('update/<str:token>', views.update_stock, name="update_stock"),
     path('delete/<str:token>', views.delete_stock, name="delete_stock"),
 ]
