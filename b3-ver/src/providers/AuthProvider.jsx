@@ -10,14 +10,14 @@ const AuthContext = createContext();
  */
 function AuthProvider ({children}) {
     const [token, setToken_] = useState('');
-    const [userName, setUserName_] = useState('');
+    const [email, setEmail_] = useState('');
     const [loading, setLoading] = useState(false);
 
     // Clears authentication data from local storage and resets state.
     const clearAuth = () => {
         localStorage.setItem('token', '');
         setToken_('');
-        setUserName_('');
+        setEmail_('');
     }
 
     // Attempts to log in with the provided credentials.
@@ -30,7 +30,6 @@ function AuthProvider ({children}) {
     // Gets auth token and user information from local storage and updates state.
     const updateContextFromStorage = async () => {
         const tokenLocal = localStorage.getItem('token');
-        console.log("Token found in storage:", tokenLocal);
         if (!tokenLocal){
             console.log("No token found in storage.");
             clearAuth();
@@ -41,7 +40,7 @@ function AuthProvider ({children}) {
         try{
             const res = await axios.get('/stock/auth');
             setToken_(tokenLocal);
-            setUserName_(res.data.user);
+            setEmail_(res.data.user);
         } catch (err){
             localStorage.removeItem('token');
         } finally {
@@ -87,12 +86,12 @@ function AuthProvider ({children}) {
     const contextValue = useMemo(
         () => ({
             token,
-            userName,
+            email,
             loading,
             clearAuth,
             tryLogin
         }),
-        [token, userName, loading]
+        [token, email, loading]
     );
 
     return (

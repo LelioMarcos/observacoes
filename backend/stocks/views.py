@@ -23,7 +23,7 @@ def __auth_token(request):
     token = request.headers['Authorization']
 
     if not token:
-        return JsonResponse({'message': 'Token is required!'}, status=401)
+        return None
 
     token = token.split(' ')[1]
 
@@ -37,8 +37,12 @@ def __auth_token(request):
 
 @csrf_exempt
 def create_stock(request):
-    username = __auth_token(request)['username']
-    user = User.objects.get(username=username)
+    email = __auth_token(request)['email']
+
+    if not email:
+        return JsonResponse({'message': 'Token is required!'}, status=401)
+
+    user = User.objects.get(email=email)
 
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
@@ -57,16 +61,24 @@ def create_stock(request):
         return JsonResponse({'message': 'Stock created successfully!'})
 
 def get_stocks(request):
-    username = __auth_token(request)['username']
-    user = User.objects.get(username=username)
+    email = __auth_token(request)['email']
+
+    if not email:
+        return JsonResponse({'message': 'Token is required!'}, status=401)
+
+    user = User.objects.get(email=email)
     
     if request.method == 'GET':
         stocks = Stock.objects.filter(user=user).values('symbol', 'price', 'upper_limit', 'lower_limit')
         return JsonResponse({'result': list(stocks)})
 
 def get_stock(request, token):
-    username = __auth_token(request)['username']
-    user = User.objects.get(username=username)
+    email = __auth_token(request)['email']
+
+    if not email:
+        return JsonResponse({'message': 'Token is required!'}, status=401)
+
+    user = User.objects.get(email=email)
 
     stock = Stock.objects.filter(user=user, symbol=token).values('symbol', 'price', 'upper_limit', 'lower_limit')
     
@@ -78,8 +90,12 @@ def get_stock(request, token):
 
 @csrf_exempt
 def update_stock(request, token):
-    username = __auth_token(request)['username']
-    user = User.objects.get(username=username)
+    email = __auth_token(request)['email']
+
+    if not email:
+        return JsonResponse({'message': 'Token is required!'}, status=401)
+
+    user = User.objects.get(email=email)
 
     if request.method == 'PUT':
         stock = Stock.objects.get(user=user, symbol=token)
@@ -108,35 +124,58 @@ def update_stock(request, token):
 def auth_token(request):
     try:
         user = __auth_token(request)
-        return JsonResponse({'message': 'Token is valid!','user': user['username']})
+        return JsonResponse({'message': 'Token is valid!','user': user['email']})
     except jwt.ExpiredSignatureError:
         return JsonResponse({'message': 'Token is expired!'}, status=401)
     except jwt.InvalidTokenError:
         return JsonResponse({'message': 'Invalid token!'}, status=401)
 
 @csrf_exempt
-def login_get(request):
+def user_login(request):
     body = json.loads(request.body)
 
-    username = body['username']
+    email = body['email']
     password = body['password']
 
     # login
-    if username is None or password is None:
+    if email is None or password is None:
         return JsonResponse({'message': 'Email and password are required!'}, status=400)
-    
-    user = authenticate(username=username, password=password)
 
-    if user is not None:
-        token = jwt.encode({'username': username}, jwt_secret, algorithm='HS256')
+    print(email, password)
+
+    user = User.objects.get(email=email)
+
+    if user.check_password(password):
+        token = jwt.encode({'email': email}, jwt_secret, algorithm='HS256')
         return JsonResponse({'message': 'Login successfully!', 'token': token.decode('utf-8')})
     else:
         return JsonResponse({'message': 'Login failed!'}, status=401)
 
+def user_create(request):
+    body = json.loads(request.body)
+
+    username = body['username']
+    email = body['email']
+    password = body['password']
+
+    if username is None or password is None:
+        return JsonResponse({'message': 'Email and password are required!'}, status=400)
+
+    user = User.objects.create_user(username=username, password=password)
+
+    if user is not None:
+        return JsonResponse({'message': 'User created successfully!'})
+    else:
+        return JsonResponse({'message': 'User creation failed!'}, status=401)
+
 @csrf_exempt
 def delete_stock(request, token):
-    username = __auth_token(request)['username']
-    user = User.objects.get(username=username)
+    email = __auth_token(request)['email']
+
+    if not email:
+        return JsonResponse({'message': 'Token is required!'}, status=401)
+
+    user = User.objects.get(email=email)
 
     if request.method == 'DELETE':
         stock = Stock.objects.get(user=user, symbol=token)

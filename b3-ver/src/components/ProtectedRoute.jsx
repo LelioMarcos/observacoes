@@ -5,6 +5,8 @@ function ProtectedRoute({children}){
     const {token, tryLogin} = useAuth();
 
     if (token) return children;
+
+    return <Navigate to="/login" />
     
 }
 

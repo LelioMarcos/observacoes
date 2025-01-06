@@ -4,12 +4,12 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../providers/AuthProvider';
 
 function Header() {
-    const { userName } = useAuth(); 
+    const { email } = useAuth(); 
 
     return (
         <>
             <Group justify="flex-end" m={{ xs: 'lg', sm: "md" }} p="10px">
-                {userName && <Text>{userName}</Text>}
+                {email && <Text>{email}</Text>}
                 <Link to="/login">
                     <Button>Login</Button>
                 </Link>

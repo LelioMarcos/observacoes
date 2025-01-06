@@ -3,12 +3,11 @@ import { useForm } from "@mantine/form";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
 
-function Login() {
-    const {token, tryLogin} = useAuth();
-
+function Register() {
     const form = useForm({
         mode: 'uncontrolled',
         initialValues: {
+            username: '',
             email: '',
             password: ''
         },
@@ -18,7 +17,7 @@ function Login() {
 
     function onSubmit(values) {
         values ={
-            email: values.email.trim(),
+            username: values.username.trim(),
             password: values.password
         }
 
@@ -40,13 +39,13 @@ function Login() {
         <Title align="center">Login</Title>
         <Stack align='center' justify='center' gap={'xs'} component={'form'} onSubmit={form.onSubmit(onSubmit)}>
             <TextInput
-                label="Email"
+                label="username"
                 placeholder="Digite seu email"
 
                 w="25%"
                 required
-                key={form.values.email}
-                {...form.getInputProps('email')}
+                key={form.values.username}
+                {...form.getInputProps('username')}
             />
             <PasswordInput
                 label="Senha"
