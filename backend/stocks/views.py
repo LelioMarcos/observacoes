@@ -11,8 +11,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 import jwt
 
-
-
 load_dotenv(".env")
 dummy_password = os.getenv("DUMMY_PASSWORD")
 jwt_secret = os.getenv("JWT_SECRET")
@@ -53,11 +51,12 @@ def create_stock(request):
         symbol = body['symbol']
         upper_limit = body['upper_limit']
         lower_limit = body['lower_limit']
+        period = body['period']
 
         price = api_b3.get_stock_price(symbol)
         print(price)
 
-        stock = Stock.objects.create(user=user, symbol=symbol, price=price, upper_limit=upper_limit, lower_limit=lower_limit)
+        stock = Stock.objects.create(user=user, symbol=symbol, price=price, period=period, upper_limit=upper_limit, lower_limit=lower_limit)
         StockHistory.objects.create(stock=stock, price=price)
 
         return JsonResponse({'message': 'Stock created successfully!'})
@@ -95,7 +94,7 @@ def get_stock(request, token):
     if not stock:
         return HttpResponse(status=404)
 
-    stock_history = StockHistory.objects.filter(stock=stock[0]['id']).values('price', 'created_at')
+    stock_history = StockHistory.objects.filter(stock=list(stock)[0]).values('price', 'created_at')
 
     stock_values = list(stock.values('symbol', 'price', 'upper_limit', 'lower_limit'))[0]
 

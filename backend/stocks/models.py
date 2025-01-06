@@ -35,6 +35,7 @@ class Stock(models.Model):
     price = models.FloatField()
     upper_limit = models.FloatField()
     lower_limit = models.FloatField()
+    period = models.IntegerField(default=1)
 
     def __str__(self):
         return self.symbol

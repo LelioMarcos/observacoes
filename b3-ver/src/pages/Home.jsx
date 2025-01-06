@@ -34,9 +34,10 @@ function Home() {
     const handleSubmit = (values) => {
       setLoadingAdd(true);
       axios.post("/stock/add/", {
-        symbol: values.symbol,
+        symbol: values.symbol.toUpperCase(),
         upper_limit: values.upper,
-        lower_limit: values.lower
+        lower_limit: values.lower,
+        period: values.period,
       }, {
 
       }).then(() => {
@@ -49,7 +50,7 @@ function Home() {
 
     const updateStock = (new_stock, index) => {
       axios.put(`/stock/update/${new_stock[index].symbol}`, {
-        symbol: new_stock[index].symbol,
+        symbol: new_stock[index].symbol.toUpperCase(),
         upper_limit: new_stock[index].upper_limit,
         lower_limit: new_stock[index].lower_limit
       }).then((response) => {
@@ -78,7 +79,7 @@ function Home() {
         <Center>
         <form style={{width: { xs: '50%', sm: "25%" }}} onSubmit={form.onSubmit((values) => handleSubmit(values))}>
           <Autocomplete
-            data={['AAPL', 'GOOGL', 'AMZN', 'TSLA']}
+            data={[]}
             label="Ação"
             placeholder="Selecione uma ação"
             required
@@ -86,7 +87,7 @@ function Home() {
             key={form.values.symbol}
             {...form.getInputProps('symbol')}
           />
-          <SimpleGrid cols={{base: 1, sm: 2}} spacing={{base: 'xs', sm: 'lg'}} mt="md">
+          <SimpleGrid cols={{base: 1, sm: 3}} spacing={{base: 'xs', sm: 'lg'}} mt="md">
             <NumberInput
               label="Valor para venda"
               placeholder="Valor para venda"
@@ -114,6 +115,16 @@ function Home() {
               step={0.01}
               key={form.values.lower}
               {...form.getInputProps('lower')}
+            />
+            <NumberInput
+              label="Período de verificação em minutos"
+              placeholder=""
+              required
+              min={1}
+              withAsterisk={false}
+              fixedDecimalScale
+              key={form.values.period}
+              {...form.getInputProps('period')}
             />
           </SimpleGrid>
           <Group justify="flex-end" mt="md">

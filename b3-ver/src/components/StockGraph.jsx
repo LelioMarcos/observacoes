@@ -22,6 +22,8 @@ function StockGraph({data, limSup, limInf}) {
             h={200}
             data={data}
             dataKey="created_at"
+            withPointLabels
+            valueFormatter={(value) => `R$${value.toFixed(2)}`}
             yAxisProps={{ domain: [yAxisLimitLower, yAxisLimitUpper] }}
             referenceLines={
                 [
