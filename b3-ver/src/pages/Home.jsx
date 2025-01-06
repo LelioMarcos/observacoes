@@ -13,7 +13,6 @@ function Home() {
     
     const fetchStocks = () => {
       axios.get("/stock/get").then((response) => {
-        console.log(response.data.result);
         setStock(response.data.result.reverse());
       });
     }
@@ -55,7 +54,8 @@ function Home() {
         lower_limit: new_stock[index].lower_limit
       }).then((response) => {
         const newStocks = [...stocks];
-        newStocks[index] = response.data.result;
+        newStocks[index].upper_limit = new_stock[index].upper_limit;
+        newStocks[index].lower_limit = new_stock[index].lower_limit;
         setStock(newStocks);
       });
     }
@@ -129,7 +129,7 @@ function Home() {
                 <Text size="xl" weight={700}>{stock.symbol}</Text>
                 <Text size="sm" c="gray" mt="xs">{stock.name}</Text>
                 <Text size="lg" weight={700} mt="xs">R${stock.price.toFixed(2)}</Text>
-                <StockGraph stock={stock.symbol} limSup={stock.upper_limit} limInf={stock.lower_limit}/>
+                <StockGraph data={stock.history} stock={stock.symbol} limSup={stock.upper_limit} limInf={stock.lower_limit}/>
                 <Divider orientation="horizontal" margins="md" />
                 <Stack>
                   <EditableNumberInput text="Valor para venda: " valueOri={stock.upper_limit} onChangeHandler={(new_val) => handleChangeLimit(new_val, 'upper_limit', index)}/>

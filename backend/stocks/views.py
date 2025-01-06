@@ -92,16 +92,16 @@ def get_stock(request, token):
 
     stock = Stock.objects.filter(user=user, symbol=token)
 
-    stock_history = StockHistory.objects.filter(stock=stock[0]['id']).values('price', 'created_at')
-
-    print(stock_history)
-
-    stock_values = stock.values('symbol', 'price', 'upper_limit', 'lower_limit')
-
     if not stock:
         return HttpResponse(status=404)
 
-    return JsonResponse({'result': list(stock)[0]})
+    stock_history = StockHistory.objects.filter(stock=stock[0]['id']).values('price', 'created_at')
+
+    stock_values = list(stock.values('symbol', 'price', 'upper_limit', 'lower_limit'))[0]
+
+    stock_values['history'] = list(stock_history)
+    
+    return JsonResponse({'result': stock_values})
 
 
 @csrf_exempt
@@ -127,7 +127,7 @@ def update_stock(request, token):
         stock.upper_limit = upper_limit
         stock.lower_limit = lower_limit
         stock.save()
-        
+       
         data = {
             'symbol': stock.symbol,
             'price': stock.price,
