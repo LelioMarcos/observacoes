@@ -2,7 +2,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../providers/AuthProvider.jsx';
 
 function ProtectedRoute({children}){
-    const {token, tryLogin} = useAuth();
+    const { token } = useAuth();
 
     if (token) return children;
 
