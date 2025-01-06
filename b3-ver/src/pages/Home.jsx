@@ -13,6 +13,7 @@ function Home() {
     
     const fetchStocks = () => {
       axios.get("/stock/get").then((response) => {
+        console.log(response.data.result);
         setStock(response.data.result.reverse());
       });
     }

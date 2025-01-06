@@ -5,6 +5,7 @@ import Layout from './pages/Layout';
 import axios from "axios";
 import AuthProvider from './providers/AuthProvider';
 import ProtectedRoute from './components/ProtectedRoute';
+import Register from './pages/Register';
 
 axios.defaults.baseURL = "http://127.0.0.1:8000";
 
@@ -19,6 +20,7 @@ function App() {
           </ProtectedRoute>
         } />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Route>
     </Routes>
     </AuthProvider>

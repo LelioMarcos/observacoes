@@ -2,50 +2,55 @@ import { TextInput, Title, Button, PasswordInput, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
+import axios from "axios";
 
 function Register() {
+    const {token} = useAuth();
+
     const form = useForm({
         mode: 'uncontrolled',
         initialValues: {
-            username: '',
             email: '',
-            password: ''
+            password: '',
+            confirmPassword: ''
         },
+
+        validate: {
+            confirmPassword: (value, values) => (value !== values.password ? 'As senhas não são iguais' : null),
+            email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Email inválido'), 
+        }               
     });
 
     const navigate = useNavigate();
 
+    if (token) {
+        return <Navigate to='/' replace />
+    }
+
     function onSubmit(values) {
-        values ={
-            username: values.username.trim(),
-            password: values.password
+        values = {
+            email: values.email.trim(),
+            password: values.password,
+            confirmPassword: values.confirmPassword
         }
 
-        tryLogin(values)
-            .then(_ => {
-                navigate('/')
-            })
-            .catch(err => {
-                setLoading(false);
-                if (err.response?.status !== 401){
-                    console.error("Login error:", err.response.data.message);
-                }
-                setError(err.response.data.message);
+        axios.post("/stock/register/", values)
+            .then((response) => {
+                navigate('/login');
             });
     }
 
     return (
         <>
-        <Title align="center">Login</Title>
+        <Title align="center">Register</Title>
         <Stack align='center' justify='center' gap={'xs'} component={'form'} onSubmit={form.onSubmit(onSubmit)}>
             <TextInput
-                label="username"
+                label="Email"
                 placeholder="Digite seu email"
-
                 w="25%"
                 required
-                key={form.values.username}
-                {...form.getInputProps('username')}
+                key={form.values.email}
+                {...form.getInputProps('email')}
             />
             <PasswordInput
                 label="Senha"
@@ -55,10 +60,18 @@ function Register() {
                 key={form.values.password}
                 {...form.getInputProps('password')}
             />
+            <PasswordInput
+                label="Confirme a senha"
+                w="25%"
+                placeholder="Digite sua senha"
+                required
+                key={form.values.confirmPassword}
+                {...form.getInputProps('confirmPassword')}
+            />
             <Button type="submit">Entrar</Button>
         </Stack>
         </>
     )
 }
 
-export default Login;
+export default Register;

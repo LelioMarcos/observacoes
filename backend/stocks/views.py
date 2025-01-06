@@ -3,13 +3,15 @@ from django.http import HttpResponse, JsonResponse
 from . import api_b3
 from django.core.serializers import serialize
 import json
-from .models import Stock, StockHistory
+from .models import Stock, StockHistory, CustomUser
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 import os
 from dotenv import load_dotenv
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 import jwt
+
+
 
 load_dotenv(".env")
 dummy_password = os.getenv("DUMMY_PASSWORD")
@@ -42,7 +44,7 @@ def create_stock(request):
     if not email:
         return JsonResponse({'message': 'Token is required!'}, status=401)
 
-    user = User.objects.get(email=email)
+    user = CustomUser.objects.get(email=email)
 
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
@@ -66,11 +68,19 @@ def get_stocks(request):
     if not email:
         return JsonResponse({'message': 'Token is required!'}, status=401)
 
-    user = User.objects.get(email=email)
+    user = CustomUser.objects.get(email=email)
     
     if request.method == 'GET':
-        stocks = Stock.objects.filter(user=user).values('symbol', 'price', 'upper_limit', 'lower_limit')
-        return JsonResponse({'result': list(stocks)})
+
+        stocks = Stock.objects.filter(user=user)
+        stocks_values = list(stocks.values('symbol', 'price', 'upper_limit', 'lower_limit'))
+
+        for i, stock in enumerate(stocks):
+            stock_history = StockHistory.objects.filter(stock=stock).values('price', 'created_at')
+            stocks_values[i]['history'] = list(stock_history)
+
+        print(stocks_values) 
+        return JsonResponse({'result': stocks_values})
 
 def get_stock(request, token):
     email = __auth_token(request)['email']
@@ -78,10 +88,16 @@ def get_stock(request, token):
     if not email:
         return JsonResponse({'message': 'Token is required!'}, status=401)
 
-    user = User.objects.get(email=email)
+    user = CustomUser.objects.get(email=email)
 
-    stock = Stock.objects.filter(user=user, symbol=token).values('symbol', 'price', 'upper_limit', 'lower_limit')
-    
+    stock = Stock.objects.filter(user=user, symbol=token)
+
+    stock_history = StockHistory.objects.filter(stock=stock[0]['id']).values('price', 'created_at')
+
+    print(stock_history)
+
+    stock_values = stock.values('symbol', 'price', 'upper_limit', 'lower_limit')
+
     if not stock:
         return HttpResponse(status=404)
 
@@ -95,7 +111,7 @@ def update_stock(request, token):
     if not email:
         return JsonResponse({'message': 'Token is required!'}, status=401)
 
-    user = User.objects.get(email=email)
+    user = CustomUser.objects.get(email=email)
 
     if request.method == 'PUT':
         stock = Stock.objects.get(user=user, symbol=token)
@@ -141,9 +157,7 @@ def user_login(request):
     if email is None or password is None:
         return JsonResponse({'message': 'Email and password are required!'}, status=400)
 
-    print(email, password)
-
-    user = User.objects.get(email=email)
+    user = CustomUser.objects.get(email=email)
 
     if user.check_password(password):
         token = jwt.encode({'email': email}, jwt_secret, algorithm='HS256')
@@ -151,17 +165,21 @@ def user_login(request):
     else:
         return JsonResponse({'message': 'Login failed!'}, status=401)
 
-def user_create(request):
+@csrf_exempt
+def user_register(request):
     body = json.loads(request.body)
 
-    username = body['username']
     email = body['email']
     password = body['password']
+    confirm_password = body['confirmPassword']
 
-    if username is None or password is None:
+    if email is None or password is None:
         return JsonResponse({'message': 'Email and password are required!'}, status=400)
 
-    user = User.objects.create_user(username=username, password=password)
+    if password != confirm_password:
+        return JsonResponse({'message': 'Passwords do not match!'}, status=400)
+
+    user = CustomUser.objects.create_user(email=email, password=password)
 
     if user is not None:
         return JsonResponse({'message': 'User created successfully!'})
@@ -175,7 +193,7 @@ def delete_stock(request, token):
     if not email:
         return JsonResponse({'message': 'Token is required!'}, status=401)
 
-    user = User.objects.get(email=email)
+    user = CustomUser.objects.get(email=email)
 
     if request.method == 'DELETE':
         stock = Stock.objects.get(user=user, symbol=token)
