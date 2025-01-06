@@ -44,7 +44,7 @@ function StockGraph({data, limSup, limInf}) {
             series={[
                 { name: 'price', color: 'indigo.6'},
             ]}
-            curveType="stepAfter"
+            curveType="linear"
         />
     );
 }
