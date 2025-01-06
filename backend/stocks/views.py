@@ -72,7 +72,7 @@ def get_stocks(request):
     if request.method == 'GET':
 
         stocks = Stock.objects.filter(user=user)
-        stocks_values = list(stocks.values('symbol', 'price', 'upper_limit', 'lower_limit'))
+        stocks_values = list(stocks.values('symbol', 'price', 'period', 'upper_limit', 'lower_limit'))
 
         for i, stock in enumerate(stocks):
             stock_history = StockHistory.objects.filter(stock=stock).values('price', 'created_at')
@@ -96,7 +96,7 @@ def get_stock(request, token):
 
     stock_history = StockHistory.objects.filter(stock=list(stock)[0]).values('price', 'created_at')
 
-    stock_values = list(stock.values('symbol', 'price', 'upper_limit', 'lower_limit'))[0]
+    stock_values = list(stock.values('symbol', 'period', 'price', 'upper_limit', 'lower_limit'))[0]
 
     stock_values['history'] = list(stock_history)
     
@@ -121,17 +121,20 @@ def update_stock(request, token):
         symbol = body['symbol']
         upper_limit = body['upper_limit']
         lower_limit = body['lower_limit']
+        period = body['period']
 
         stock.symbol = symbol
         stock.upper_limit = upper_limit
         stock.lower_limit = lower_limit
+        stock.period = period
         stock.save()
        
         data = {
             'symbol': stock.symbol,
             'price': stock.price,
             'upper_limit': stock.upper_limit,
-            'lower_limit': stock.lower_limit
+            'lower_limit': stock.lower_limit,
+            'period': stock.period,
         }
         return JsonResponse({'message': 'Update successfully!', 'result': data}) 
 

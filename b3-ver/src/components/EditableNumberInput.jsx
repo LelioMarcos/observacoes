@@ -2,7 +2,7 @@ import { Button, Group, NumberInput, Text } from "@mantine/core";
 import { useToggle } from "@mantine/hooks";
 import { useState } from "react";
 
-function EditableNumberInput({ text, valueOri, onChangeHandler }) {
+function EditableNumberInput({ text, prefix, decimalScale, step, valueOri, onChangeHandler }) {
     const [element, setElement] = useState(false);
     const [value, setValue] = useState(valueOri);
 
@@ -12,17 +12,19 @@ function EditableNumberInput({ text, valueOri, onChangeHandler }) {
                 <NumberInput
                     w={100}
                     min={0}
-                    prefix="R$"
+                    prefix={prefix}
                     size="xs"
-                    decimalScale={2}
+                    decimalScale={decimalScale}
                     fixedDecimalScale
                     decimalSeparator=","
                     value={value}
-                    step={0.01}
+                    step={step}
                     onChange={(val) => setValue(val)}
                 />
                 ) : (
-                    <Text size="xs">{text} R${value.toFixed(2)}</Text>
+                    <Text size="xs">{text} {prefix}{
+                        prefix === "R$" ? value.toFixed(2) : value
+                    }</Text>
                 )} 
             <Button size="xs" onClick={() => {
                 setElement(!element)

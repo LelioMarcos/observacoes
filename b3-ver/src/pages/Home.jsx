@@ -52,11 +52,13 @@ function Home() {
       axios.put(`/stock/update/${new_stock[index].symbol}`, {
         symbol: new_stock[index].symbol.toUpperCase(),
         upper_limit: new_stock[index].upper_limit,
-        lower_limit: new_stock[index].lower_limit
+        lower_limit: new_stock[index].lower_limit,
+        period: new_stock[index].period
       }).then((response) => {
         const newStocks = [...stocks];
         newStocks[index].upper_limit = new_stock[index].upper_limit;
         newStocks[index].lower_limit = new_stock[index].lower_limit;
+        newStocks[index].period = new_stock[index].period;
         setStock(newStocks);
       });
     }
@@ -118,7 +120,7 @@ function Home() {
             />
             <NumberInput
               label="Período de verificação em minutos"
-              placeholder=""
+              placeholder="Período em minutos"
               required
               min={1}
               withAsterisk={false}
@@ -143,8 +145,9 @@ function Home() {
                 <StockGraph data={stock.history} stock={stock.symbol} limSup={stock.upper_limit} limInf={stock.lower_limit}/>
                 <Divider orientation="horizontal" margins="md" />
                 <Stack>
-                  <EditableNumberInput text="Valor para venda: " valueOri={stock.upper_limit} onChangeHandler={(new_val) => handleChangeLimit(new_val, 'upper_limit', index)}/>
-                  <EditableNumberInput text="Valor para compra: " valueOri={stock.lower_limit} onChangeHandler={(new_val) => handleChangeLimit(new_val, 'lower_limit', index)}/>
+                  <EditableNumberInput text="Valor para venda: " prefix="R$" step={0.01} decimalScale={2} valueOri={stock.upper_limit} onChangeHandler={(new_val) => handleChangeLimit(new_val, 'upper_limit', index)}/>
+                  <EditableNumberInput text="Valor para compra: " prefix="R$" step={0.01} decimalScale={2} valueOri={stock.lower_limit} onChangeHandler={(new_val) => handleChangeLimit(new_val, 'lower_limit', index)}/>
+                  <EditableNumberInput text="Periodo em minutos de aviso: " step={0.01} valueOri={stock.period} onChangeHandler={(new_val) => handleChangeLimit(new_val, 'period', index)}/>
                 </Stack>
                 <Button mt="sm" onClick={() => handleRemove(index)} variant="light" color="red">Remover</Button>
             </Card>
