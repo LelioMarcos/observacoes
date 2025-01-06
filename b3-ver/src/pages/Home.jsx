@@ -10,8 +10,6 @@ import { useAuth } from '../providers/AuthProvider';
 function Home() {
     const [stocks, setStock] = useState([]); 
     const [loadingAdd, setLoadingAdd] = useState(false);
-
-    
     
     const fetchStocks = () => {
       axios.get("/stock/get").then((response) => {

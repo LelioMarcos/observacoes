@@ -16,6 +16,10 @@ function Login() {
 
     const navigate = useNavigate();
 
+    if (token) {
+        return <Navigate to='/' replace />
+    }
+
     function onSubmit(values) {
         values ={
             email: values.email.trim(),

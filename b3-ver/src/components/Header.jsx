@@ -14,20 +14,21 @@ function Header() {
         <>
             <Group justify="flex-end" m={{ xs: 'lg', sm: "md" }} p="10px">
                 {email ? 
+                    <>
                     <Text>{email}</Text>
-                    :
-                    <Link to="/register">
-                        <Button>Register</Button>
-                    </Link>
-                }
-                {email ? 
                     <Link onClick={logOut}>
                         <Button>Logout</Button>
                     </Link>
+                    </>
                     :
+                    <>
+                    <Link to="/register">
+                        <Button>Register</Button>
+                    </Link>
                     <Link to="/login">
                         <Button>Login</Button>
                     </Link>
+                    </>
                 }
             </Group>
         </>
