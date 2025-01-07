@@ -56,7 +56,7 @@ def create_stock(request):
         price = api_b3.get_stock_price(symbol)
 
         if not price:
-            return JsonResponse({'message': 'Stock not found!'}, status=404)
+            return JsonResponse({'message': 'Ação não encontrada.'}, status=404)
 
         stock = Stock.objects.create(user=user, symbol=symbol, price=price, period=period, upper_limit=upper_limit, lower_limit=lower_limit)
         StockHistory.objects.create(stock=stock, price=price)

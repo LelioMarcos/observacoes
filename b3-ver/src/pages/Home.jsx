@@ -16,7 +16,7 @@ function Home() {
     const fetchStocks = () => {
       axios.get("/stock/get").then((res) => {
         setStock(res.data.result.reverse());
-      })
+      });
     }
     
     useEffect(() => {
@@ -29,15 +29,14 @@ function Home() {
     const addStock = (symbol) => {
       axios.get(`/stock/get/${symbol}`).then((response) => {
         setStock([response.data.result, ...stocks]);
-      }).error((error) => {
-        console.log(error.response.data);
-      });
+      })
     }
     const form = useForm({
       mode: 'uncontrolled',
     })
 
     const handleSubmit = (values) => {
+      setAddError('');
       setLoadingAdd(true);
       axios.post("/stock/add/", {
         symbol: values.symbol.toUpperCase(),
@@ -48,9 +47,10 @@ function Home() {
 
       }).then(() => {
         addStock(values.symbol);
-        setLoadingAdd(false);
       }).catch((error) => {
-        console.log(error)
+        setAddError(error.response.data.message);
+      }).finally(() => {
+        setLoadingAdd(false);
       });
     };
 
