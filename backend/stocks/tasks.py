@@ -8,6 +8,9 @@ from . import api_b3
 
 minute_counter = 0
 
+def number_to_brl(value):
+    return f'R${value:.2f}'.replace('.', ',')
+
 @shared_task
 def send_email(subject, message, recipient_list):
     send_mail(subject, message, settings.EMAIL_HOST_USER, recipient_list)
@@ -36,16 +39,14 @@ def update_ativo_price():
 
             StockHistory.objects.create(stock=ativo, price=new_price)
             if ativo.is_to_buy():
-                print(f'Alerta de compra: {ativo.symbol} está abaixo do limite inferior para {ativo.user.email}')
                 send_email.delay(
                     'Alerta para comprar ação',
-                    f'Atualmente a ação {ativo.symbol} está no valor de R${ativo.price}, abaixo do limite inferior que você definiu (R${ativo.lower_limit}).',
+                    f'Atualmente a ação {ativo.symbol} está no valor de {number_to_brl(ativo.price)}, abaixo do limite inferior que você definiu ({number_to_brl(ativo.lower_limit)}) para a compra dessa ação.',
                    [ativo.user.email]
                 )
             elif ativo.is_to_sell():
-                print(f'Alerta de venda: {ativo.symbol} está acima do limite superior para {ativo.user.email}')
                 send_email.delay(
                     'Alerta para vender ação',
-                    f'Atualmente a ação {ativo.symbol} está no valor de R${ativo.price}, acima do limite superior que você definiu (R${ativo.upper_limit}).',
+                    f'Atualmente a ação {ativo.symbol} está no valor de R${number_to_brl(ativo.price)}, acima do limite superior que você definiu ({number_to_brl(ativo.upper_limit)}) para a venda dessa ação.',
                     [ativo.user.email]
                 )

@@ -23,7 +23,7 @@ function EditableNumberInput({ text, prefix, decimalScale, step, valueOri, onCha
                 />
                 ) : (
                     <Text size="xs">{text} {prefix}{
-                        prefix === "R$" ? value.toFixed(2) : value
+                        prefix === "R$" ? value.toFixed(2).toString().replace('.', ',') : value
                     }</Text>
                 )} 
             <Button size="xs" onClick={() => {

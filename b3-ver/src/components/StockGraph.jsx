@@ -35,7 +35,7 @@ function StockGraph({symbol, data, limSup, limInf}) {
             data={newData}
             dataKey="created_at"
             withPointLabels
-            valueFormatter={(value) => `R$${value.toFixed(2)}`}
+            valueFormatter={(value) => `R$${value.toFixed(2)}`.replace('.', ',')}
             yAxisProps={{ domain: [yAxisLimitLower, yAxisLimitUpper] }}
             referenceLines={
                 [
@@ -45,7 +45,7 @@ function StockGraph({symbol, data, limSup, limInf}) {
             }
             gridAxis="y"
             series={[
-                { name: 'price', color: 'indigo.6'},
+                { name: 'price', color: 'blue', label: 'Preço' },
             ]}
             curveType="linear"
         />
