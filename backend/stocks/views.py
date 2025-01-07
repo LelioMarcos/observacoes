@@ -165,7 +165,7 @@ def user_login(request):
 
     if user.check_password(password):
         token = jwt.encode({'email': email}, jwt_secret, algorithm='HS256')
-        return JsonResponse({'message': 'Login successfully!', 'token': token.decode('utf-8')})
+        return JsonResponse({'message': 'Login successfully!', 'token': token})
     else:
         return JsonResponse({'message': 'Login failed!'}, status=401)
 
