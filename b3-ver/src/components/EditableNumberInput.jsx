@@ -1,5 +1,4 @@
 import { Button, Group, NumberInput, Text } from "@mantine/core";
-import { useToggle } from "@mantine/hooks";
 import { useState } from "react";
 
 function EditableNumberInput({ text, prefix, decimalScale, step, valueOri, onChangeHandler }) {

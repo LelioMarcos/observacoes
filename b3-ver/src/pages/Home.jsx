@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Autocomplete, Box, Button, NumberInput, Title, SimpleGrid, Card, Text, Divider, ActionIcon, Group, Stack, Center, TextInput} from '@mantine/core';
+import { Button, NumberInput, Title, SimpleGrid, Text, Group, Center, TextInput} from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { Link } from 'react-router-dom';
-import StockGraph from '../components/StockGraph';
-import EditableNumberInput from '../components/EditableNumberInput';
 import axios from 'axios';
-import { useAuth } from '../providers/AuthProvider';
 import StockCard from '../components/StockCard';
 
 function Home() {
@@ -33,11 +29,12 @@ function Home() {
     }
     const form = useForm({
       mode: 'uncontrolled',
-    })
+    });
 
     const handleSubmit = (values) => {
       setAddError('');
       setLoadingAdd(true);
+
       axios.post("/stock/add/", {
         symbol: values.symbol.toUpperCase(),
         upper_limit: values.upper,
@@ -59,7 +56,7 @@ function Home() {
         <Title align="center">ObservAções</Title>
         <Center>
         <form style={{width: { xs: '50%', sm: "25%" }}} onSubmit={form.onSubmit((values) => handleSubmit(values))}>
-          <Text align='center' c='red'>{addError}</Text>
+          <Text align='center' c='red' fw={700}>{addError}</Text>
           <TextInput
             label="Ação"
             placeholder="Selecione uma ação"

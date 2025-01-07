@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Button, Group, Text } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../providers/AuthProvider';
