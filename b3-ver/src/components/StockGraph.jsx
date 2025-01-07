@@ -2,9 +2,10 @@ import { LineChart } from "@mantine/charts";
 import '@mantine/charts/styles.css';
 import { useState, useEffect } from "react";
 
-function StockGraph({data, limSup, limInf}) {  
+function StockGraph({symbol, data, limSup, limInf}) {  
     const [yAxisLimitLower, setYAxisLimitLower] = useState(0);  
     const [yAxisLimitUpper, setYAxisLimitUpper] = useState(0);  
+    const [data_, setData_] = useState(data);
 
     useEffect(() => {
         const maxPrice = Math.max(...data.map((item) => item.price));
@@ -15,6 +16,8 @@ function StockGraph({data, limSup, limInf}) {
 
         if (minPrice < limInf) setYAxisLimitLower(minPrice - (maxPrice - minPrice) * 0.1);
         else setYAxisLimitLower(limInf - (limSup - limInf) * 0.1);
+
+        
         
     }, [data, limSup, limInf]);
 

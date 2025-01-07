@@ -10,21 +10,25 @@ import { useAuth } from '../providers/AuthProvider';
 function Home() {
     const [stocks, setStock] = useState([]); 
     const [loadingAdd, setLoadingAdd] = useState(false);
+    const [loadingRemove, setLoadingRemove] = useState(false);
     
     const fetchStocks = () => {
-      axios.get("/stock/get").then((response) => {
-        setStock(response.data.result.reverse());
-      });
+      axios.get("/stock/get").then((res) => {
+        setStock(res.data.result.reverse());
+      })
     }
     
-    const fetchOneStock = (symbol) => {
+    const addStock = (symbol) => {
       axios.get(`/stock/get/${symbol}`).then((response) => {
         setStock([response.data.result, ...stocks]);
       });
     }
 
     useEffect(() => {
-      fetchStocks()
+      fetchStocks();
+      setInterval(() => {
+        fetchStocks();
+      }, 60000);
     }, []);
 
     const form = useForm({
@@ -41,7 +45,7 @@ function Home() {
       }, {
 
       }).then(() => {
-        fetchOneStock(values.symbol);
+        addStock(values.symbol);
         setLoadingAdd(false);
       }).catch((error) => {
         console.log(error)
@@ -141,15 +145,15 @@ function Home() {
             <Card href={`/symbol/${stock.symbol}`} key={stock.symbol} shadow="xs" padding="md"> 
                 <Text size="xl" weight={700}>{stock.symbol}</Text>
                 <Text size="sm" c="gray" mt="xs">{stock.name}</Text>
-                <Text size="lg" weight={700} mt="xs">R${stock.price.toFixed(2)}</Text>
-                <StockGraph data={stock.history} stock={stock.symbol} limSup={stock.upper_limit} limInf={stock.lower_limit}/>
+                <Text size="lg" weight={700} mt="xs">R${stock.price.toFixed(2).toString().replace('.', ',')}</Text>
+                <StockGraph symbol={stock.symbol} data={stock.history} stock={stock.symbol} limSup={stock.upper_limit} limInf={stock.lower_limit}/>
                 <Divider orientation="horizontal" margins="md" />
                 <Stack>
                   <EditableNumberInput text="Valor para venda: " prefix="R$" step={0.01} decimalScale={2} valueOri={stock.upper_limit} onChangeHandler={(new_val) => handleChangeLimit(new_val, 'upper_limit', index)}/>
                   <EditableNumberInput text="Valor para compra: " prefix="R$" step={0.01} decimalScale={2} valueOri={stock.lower_limit} onChangeHandler={(new_val) => handleChangeLimit(new_val, 'lower_limit', index)}/>
                   <EditableNumberInput text="Periodo em minutos de aviso: " step={0.01} valueOri={stock.period} onChangeHandler={(new_val) => handleChangeLimit(new_val, 'period', index)}/>
                 </Stack>
-                <Button mt="sm" onClick={() => handleRemove(index)} variant="light" color="red">Remover</Button>
+                <Button mt="sm" onClick={() => handleRemove(index)} loading={loadingRemove} variant="light" color="red">Remover</Button>
             </Card>
           ))}
         </SimpleGrid> :
