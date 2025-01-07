@@ -9,6 +9,10 @@ from . import api_b3
 minute_counter = 0
 
 @shared_task
+def send_email(subject, message, recipient_list):
+    send_mail(subject, message, settings.EMAIL_HOST_USER, recipient_list)
+
+@shared_task
 def update_ativo_price():
     global minute_counter
 
@@ -20,6 +24,9 @@ def update_ativo_price():
     minute_counter += 1
 
     for ativo in ativos:
+        if ativo.symbol == "TEST4":
+            continue
+
         if minute_counter % ativo.period == 0:
             print(f'{minute_counter}: Checking {ativo.symbol} for {ativo.user.email}')
             new_price = api_b3.get_stock_price(ativo.symbol)
@@ -30,17 +37,15 @@ def update_ativo_price():
             StockHistory.objects.create(stock=ativo, price=new_price)
             if ativo.is_to_buy():
                 print(f'Alerta de compra: {ativo.symbol} está abaixo do limite inferior para {ativo.user.email}')
-                send_mail(
+                send_email.delay(
                     'Alerta para comprar ação',
                     f'Atualmente a ação {ativo.symbol} está no valor de R${ativo.price}, abaixo do limite inferior que você definiu (R${ativo.lower_limit}).',
-                   settings.EMAIL_HOST_USER,
                    [ativo.user.email]
-               )
+                )
             elif ativo.is_to_sell():
                 print(f'Alerta de venda: {ativo.symbol} está acima do limite superior para {ativo.user.email}')
-                send_mail(
+                send_email.delay(
                     'Alerta para vender ação',
                     f'Atualmente a ação {ativo.symbol} está no valor de R${ativo.price}, acima do limite superior que você definiu (R${ativo.upper_limit}).',
-                    settings.EMAIL_HOST_USER,
                     [ativo.user.email]
-               )
+                )
