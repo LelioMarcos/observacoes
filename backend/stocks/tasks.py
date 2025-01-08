@@ -36,8 +36,10 @@ def update_ativo_price():
 
             ativo.price = new_price
             ativo.save()
-
             StockHistory.objects.create(stock=ativo, price=new_price)
+
+            print(f'{ativo.symbol} price updated to {ativo.price}')
+
             if ativo.is_to_buy():
                 send_email.delay(
                     'Alerta para comprar ação',
@@ -47,6 +49,6 @@ def update_ativo_price():
             elif ativo.is_to_sell():
                 send_email.delay(
                     'Alerta para vender ação',
-                    f'Atualmente a ação {ativo.symbol} está no valor de R${number_to_brl(ativo.price)}, acima do limite superior que você definiu ({number_to_brl(ativo.upper_limit)}) para a venda dessa ação.',
+                    f'Atualmente a ação {ativo.symbol} está no valor de {number_to_brl(ativo.price)}, acima do limite superior que você definiu ({number_to_brl(ativo.upper_limit)}) para a venda dessa ação.',
                     [ativo.user.email]
                 )

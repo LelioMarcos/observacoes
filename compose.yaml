@@ -3,9 +3,18 @@ services:
     build: ./backend/
     ports:
       - "8000:8000"
+    depends_on:
+      - redis
   frontend:
     build: ./b3-ver/
     ports:
       - "8080:8080"
   redis:
     image: "redis:alpine"
+  celery:
+    build: ./backend/
+    command: python -m celery -A b3_ver worker -B -l info
+    depends_on:
+      - redis
+    volumes:
+      - ./backend/db.sqlite3:/app/db.sqlite3
