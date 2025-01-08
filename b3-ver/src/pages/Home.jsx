@@ -17,9 +17,13 @@ function Home() {
     
     useEffect(() => {
       fetchStocks();
-      setInterval(() => {
+      const timer = setInterval(() => {
         fetchStocks();
       }, 60000);
+
+      return () => {
+        clearInterval(timer);
+      }
     }, []);
 
     const addStock = (symbol) => {

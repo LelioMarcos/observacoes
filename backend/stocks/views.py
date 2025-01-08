@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 import jwt
+from .tasks import send_email, number_to_brl
 
 load_dotenv(".env")
 dummy_password = os.getenv("DUMMY_PASSWORD")
@@ -58,8 +59,24 @@ def create_stock(request):
         if not price:
             return JsonResponse({'message': 'Ação não encontrada.'}, status=404)
 
+        if Stock.objects.filter(user=user, symbol=symbol):
+            return JsonResponse({'message': 'Ação já cadastrada.'}, status=400)
+
         stock = Stock.objects.create(user=user, symbol=symbol, price=price, period=period, upper_limit=upper_limit, lower_limit=lower_limit)
         StockHistory.objects.create(stock=stock, price=price)
+
+        if stock.is_to_buy():
+            send_email.delay(
+                'Alerta para comprar ação',
+                f'Atualmente a ação {stock.symbol} está no valor de {number_to_brl(stock.price)}, abaixo do limite inferior que você definiu ({number_to_brl(stock.lower_limit)}) para a compra dessa ação.',
+                [stock.user.email]
+            )
+        elif stock.is_to_sell():
+            send_email.delay(
+                'Alerta para vender ação',
+                f'Atualmente a ação {stock.symbol} está no valor de {number_to_brl(stock.price)}, acima do limite superior que você definiu ({number_to_brl(stock.upper_limit)}) para a venda dessa ação.',
+                [stock.user.email]
+            )
 
         return JsonResponse({'message': 'Stock created successfully!'})
 

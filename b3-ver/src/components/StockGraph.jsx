@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 function StockGraph({symbol, data, limSup, limInf}) {  
     const [yAxisLimitLower, setYAxisLimitLower] = useState(0);  
     const [yAxisLimitUpper, setYAxisLimitUpper] = useState(0);  
-    const [data_, setData_] = useState(data);
 
     useEffect(() => {
         const maxPrice = Math.max(...data.map((item) => item.price));
@@ -34,7 +33,6 @@ function StockGraph({symbol, data, limSup, limInf}) {
             h={200}
             data={newData}
             dataKey="created_at"
-            withPointLabels
             valueFormatter={(value) => `R$${value.toFixed(2)}`.replace('.', ',')}
             yAxisProps={{ domain: [yAxisLimitLower, yAxisLimitUpper] }}
             referenceLines={

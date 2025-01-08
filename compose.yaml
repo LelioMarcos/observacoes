@@ -5,6 +5,10 @@ services:
       - "8000:8000"
     depends_on:
       - redis
+      - celery
+    volumes:
+      - ./backend/:/app
+
   frontend:
     build: ./b3-ver/
     ports:
@@ -13,8 +17,9 @@ services:
     image: "redis:alpine"
   celery:
     build: ./backend/
-    command: python -m celery -A b3_ver worker -B -l info
+    entrypoint: /app/entrypoint_celery.sh
     depends_on:
       - redis
+    restart: on-failure
     volumes:
-      - ./backend/db.sqlite3:/app/db.sqlite3
+      - ./backend/:/app

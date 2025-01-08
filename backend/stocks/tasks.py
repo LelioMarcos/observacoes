@@ -34,11 +34,14 @@ def update_ativo_price():
             print(f'{minute_counter}: Checking {ativo.symbol} for {ativo.user.email}')
             new_price = api_b3.get_stock_price(ativo.symbol)
 
+            old_price = ativo.price
             ativo.price = new_price
             ativo.save()
             StockHistory.objects.create(stock=ativo, price=new_price)
-
-            print(f'{ativo.symbol} price updated to {ativo.price}')
+            
+            if new_price == old_price:
+                print("Same price. Not sending email.")
+                continue
 
             if ativo.is_to_buy():
                 send_email.delay(

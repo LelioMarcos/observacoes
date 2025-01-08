@@ -32,6 +32,7 @@ function StockCard({stocks, stock, index, setStock, fetchStocks}) {
     const handleRemove = (index) => {
         setLoading(true);
         axios.delete(`/stock/delete/${stocks[index].symbol}`).then(() => {
+            setLoading(false);
             fetchStocks();
         });
     }
