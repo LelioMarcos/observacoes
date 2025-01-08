@@ -2,9 +2,11 @@ import { TextInput, Title, Button, PasswordInput, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
+import { useState } from "react";
 
 function Login() {
     const {token, tryLogin} = useAuth();
+    const [loading, setLoading] = useState(false);
 
     const form = useForm({
         mode: 'uncontrolled',
@@ -21,6 +23,7 @@ function Login() {
     }
 
     function onSubmit(values) {
+        setLoading(true);
         values ={
             email: values.email.trim(),
             password: values.password
@@ -36,6 +39,8 @@ function Login() {
                     console.error("Login error:", err.response.data.message);
                 }
                 setError(err.response.data.message);
+            }).finally(() => {
+                setLoading(false);
             });
     }
 
@@ -60,7 +65,7 @@ function Login() {
                 key={form.values.password}
                 {...form.getInputProps('password')}
             />
-            <Button type="submit">Entrar</Button>
+            <Button loading={loading} type="submit">Entrar</Button>
         </Stack>
         </>
     )

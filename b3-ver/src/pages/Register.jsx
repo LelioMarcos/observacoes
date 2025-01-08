@@ -3,9 +3,11 @@ import { useForm } from "@mantine/form";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
 import axios from "axios";
+import { useState } from "react";
 
 function Register() {
     const {token} = useAuth();
+    const [loading, setLoading] = useState(false);
 
     const form = useForm({
         mode: 'uncontrolled',
@@ -28,6 +30,7 @@ function Register() {
     }
 
     function onSubmit(values) {
+        setLoading(true);
         values = {
             email: values.email.trim(),
             password: values.password,
@@ -37,6 +40,8 @@ function Register() {
         axios.post("/stock/register/", values)
             .then((response) => {
                 navigate('/login');
+            }).finally(() => {
+                setLoading(false);
             });
     }
 
@@ -68,7 +73,7 @@ function Register() {
                 key={form.values.confirmPassword}
                 {...form.getInputProps('confirmPassword')}
             />
-            <Button type="submit">Entrar</Button>
+            <Button loading={loading} type="submit">Entrar</Button>
         </Stack>
         </>
     )

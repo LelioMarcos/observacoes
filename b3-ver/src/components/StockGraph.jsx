@@ -43,7 +43,7 @@ function StockGraph({symbol, data, limSup, limInf}) {
             }
             gridAxis="y"
             series={[
-                { name: 'price', color: 'blue', label: 'Preço' },
+                { name: 'price', color: 'blue', label: 'Cotação' },
             ]}
             curveType="linear"
         />
