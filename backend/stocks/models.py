@@ -46,19 +46,19 @@ class Stock(models.Model):
     def is_to_sell(self):
         return self.price >= self.upper_limit
 
-    def number_to_brl(price):
+    def __number_to_brl(price):
         return f'R${price:.2f}'.replace('.', ',')
 
     def buy_email(self):
         return {
-            about: "Alerta para comprar ação",
-            body: f'Atualmente a ação {self.symbol} está no valor de {number_to_brl(self.price)}, abaixo do limite inferior que você definiu ({number_to_brl(self.lower_limit)}) para a compra dessa ação.'
+            'about': "Alerta para comprar ação",
+            'body': f'Atualmente a ação {self.symbol} está no valor de {__number_to_brl(self.price)}, abaixo do limite inferior que você definiu ({__number_to_brl(self.lower_limit)}) para a compra dessa ação.'
         }
 
     def sell_email(self):
         return {
-            about: "Alerta para vender ação",
-            body: f'Atualmente a ação {self.symbol} está no valor de {number_to_brl(self.price)}, acima do limite superior que você definiu ({number_to_brl(self.upper_limit)}) para a venda dessa ação.',
+            'about': "Alerta para vender ação",
+            'body': f'Atualmente a ação {self.symbol} está no valor de {__number_to_brl(self.price)}, acima do limite superior que você definiu ({__number_to_brl(self.upper_limit)}) para a venda dessa ação.',
         }
 
 class StockHistory(models.Model):

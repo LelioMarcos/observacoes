@@ -35,7 +35,6 @@ def __auth_token(request):
     except jwt.InvalidTokenError:
         return None
 
-@csrf_exempt
 def create_stock(request):
     email = __auth_token(request)['email']
 
@@ -115,7 +114,6 @@ def get_stock(request, token):
     return JsonResponse({'result': stock_values})
 
 
-@csrf_exempt
 def update_stock(request, token):
     email = __auth_token(request)['email']
 
@@ -150,7 +148,6 @@ def update_stock(request, token):
         }
         return JsonResponse({'message': 'Update successfully!', 'result': data}) 
 
-@csrf_exempt
 def auth_token(request):
     try:
         user = __auth_token(request)
@@ -160,7 +157,6 @@ def auth_token(request):
     except jwt.InvalidTokenError:
         return JsonResponse({'message': 'Invalid token!'}, status=401)
 
-@csrf_exempt
 def user_login(request):
     body = json.loads(request.body)
 
@@ -179,7 +175,6 @@ def user_login(request):
     else:
         return JsonResponse({'message': 'Login failed!'}, status=401)
 
-@csrf_exempt
 def user_register(request):
     body = json.loads(request.body)
 
@@ -200,7 +195,6 @@ def user_register(request):
     else:
         return JsonResponse({'message': 'User creation failed!'}, status=401)
 
-@csrf_exempt
 def delete_stock(request, token):
     email = __auth_token(request)['email']
 
