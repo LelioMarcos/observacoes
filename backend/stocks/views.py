@@ -13,7 +13,6 @@ import jwt
 from .tasks import send_email, number_to_brl
 
 load_dotenv(".env")
-dummy_password = os.getenv("DUMMY_PASSWORD")
 jwt_secret = os.getenv("JWT_SECRET")
 
 # Create your views here.
@@ -66,17 +65,11 @@ def create_stock(request):
         StockHistory.objects.create(stock=stock, price=price)
 
         if stock.is_to_buy():
-            send_email.delay(
-                'Alerta para comprar ação',
-                f'Atualmente a ação {stock.symbol} está no valor de {number_to_brl(stock.price)}, abaixo do limite inferior que você definiu ({number_to_brl(stock.lower_limit)}) para a compra dessa ação.',
-                [stock.user.email]
-            )
+            email = stock.buy_email()
+            send_email.delay(email['about'], email['body'], stock.user.email)
         elif stock.is_to_sell():
-            send_email.delay(
-                'Alerta para vender ação',
-                f'Atualmente a ação {stock.symbol} está no valor de {number_to_brl(stock.price)}, acima do limite superior que você definiu ({number_to_brl(stock.upper_limit)}) para a venda dessa ação.',
-                [stock.user.email]
-            )
+            email = stock.sell_email()
+            send_email.delay(email['about'], email['body'], stock.user.email)
 
         return JsonResponse({'message': 'Stock created successfully!'})
 
