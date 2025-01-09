@@ -8,6 +8,7 @@ import { useState } from "react";
 function Register() {
     const {token} = useAuth();
     const [loading, setLoading] = useState(false);
+    const [registerError, setRegisterError] = useState('');
 
     const form = useForm({
         mode: 'uncontrolled',
@@ -40,6 +41,8 @@ function Register() {
         axios.post("/stock/register/", values)
             .then((response) => {
                 navigate('/login');
+            }).catch(err => {
+                setRegisterError(err.response.data.message);
             }).finally(() => {
                 setLoading(false);
             });
@@ -49,6 +52,7 @@ function Register() {
         <>
         <Title align="center">Register</Title>
         <Stack align='center' justify='center' gap={'xs'} component={'form'} onSubmit={form.onSubmit(onSubmit)}>
+            <Text align='center' c='red' fw={700}>{registerError}</Text>
             <TextInput
                 label="Email"
                 placeholder="Digite seu email"

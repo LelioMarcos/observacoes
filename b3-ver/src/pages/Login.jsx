@@ -40,7 +40,6 @@ function Login() {
                 navigate('/')
             })
             .catch(err => {
-                setLoading(false);
                 setLoginError(err.response.data.message);
             }).finally(() => {
                 setLoading(false);

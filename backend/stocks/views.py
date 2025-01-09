@@ -191,8 +191,8 @@ def user_register(request):
     password = body['password']
     confirm_password = body['confirmPassword']
 
-    if email is None or password is None:
-        return JsonResponse({'message': 'Email and password are required!'}, status=400)
+    if email is None or password is None or confirm_password is None:
+        return JsonResponse({'message': 'Email and passwords are required!'}, status=400)
 
     if password != confirm_password:
         return JsonResponse({'message': 'Passwords do not match!'}, status=400)
