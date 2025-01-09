@@ -19,9 +19,7 @@ def update_ativo_price():
 
     if not stocks:
         return
-
-    minute_counter += 1
-
+        
     for stock in stocks:
         if stock.symbol == "TEST4":
             continue
@@ -29,9 +27,8 @@ def update_ativo_price():
         last_record = StockHistory.objects.filter(stock=stock).last()
         
         if datetime.datetime.now(tz=datetime.timezone.utc).replace(second=0, microsecond=0) - last_record.created_at.replace(second=0, microsecond=0) >= datetime.timedelta(minutes=stock.period): 
-            print(f'{minute_counter}: Checking {stock.symbol} for {stock.user.email}')
             new_price = api_b3.get_stock_price(stock.symbol)
-
+            
             old_price = stock.price
             stock.price = new_price
             stock.save()
