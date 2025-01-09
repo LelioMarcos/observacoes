@@ -6,8 +6,6 @@ import datetime
 from django.conf import settings
 from . import api_b3
 
-minute_counter = 0
-
 def number_to_brl(value):
     return f'R${value:.2f}'.replace('.', ',')
 
@@ -17,8 +15,6 @@ def send_email(subject, message, recipient):
 
 @shared_task
 def update_ativo_price():
-    global minute_counter
-
     stocks = Stock.objects.all()
 
     if not stocks:
@@ -29,8 +25,10 @@ def update_ativo_price():
     for stock in stocks:
         if stock.symbol == "TEST4":
             continue
-
-        if minute_counter % stock.period == 0:
+        
+        last_record = StockHistory.objects.filter(stock=stock).last()
+        
+        if datetime.datetime.now(tz=datetime.timezone.utc).replace(second=0, microsecond=0) - last_record.created_at.replace(second=0, microsecond=0) >= datetime.timedelta(minutes=stock.period): 
             print(f'{minute_counter}: Checking {stock.symbol} for {stock.user.email}')
             new_price = api_b3.get_stock_price(stock.symbol)
 
