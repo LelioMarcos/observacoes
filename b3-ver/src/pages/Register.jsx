@@ -32,6 +32,7 @@ function Register() {
 
     function onSubmit(values) {
         setLoading(true);
+        setRegisterError('');
         values = {
             email: values.email.trim(),
             password: values.password,
