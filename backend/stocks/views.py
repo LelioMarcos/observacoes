@@ -1,16 +1,13 @@
-from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from . import api_b3
-from django.core.serializers import serialize
 import json
 from .models import Stock, StockHistory, CustomUser
-from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 import os
 from dotenv import load_dotenv
-from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 import jwt
-from .tasks import send_email, number_to_brl
+from .tasks import send_email
+from datetime import timezone
 
 load_dotenv(".env")
 jwt_secret = os.getenv("JWT_SECRET")
@@ -72,7 +69,7 @@ def create_stock(request):
 
         return JsonResponse({'message': 'Stock created successfully!'})
 
-def get_stocks(request):
+def get_all_stocks(request):
     email = __auth_token(request)['email']
 
     if not email:
@@ -113,7 +110,6 @@ def get_stock(request, token):
     
     return JsonResponse({'result': stock_values})
 
-
 def update_stock(request, token):
     email = __auth_token(request)['email']
 
@@ -142,6 +138,20 @@ def update_stock(request, token):
         }
         return JsonResponse({'message': 'Update successfully!', 'result': data}) 
 
+def delete_stock(request, token):
+    email = __auth_token(request)['email']
+
+    if not email:
+        return JsonResponse({'message': 'Token is required!'}, status=401)
+
+    user = CustomUser.objects.get(email=email)
+
+    if request.method == 'DELETE':
+        stock = Stock.objects.get(user=user, symbol=token)
+        stock.delete()
+
+        return JsonResponse({'message': 'Deleted successfully!'})
+
 def auth_token(request):
     try:
         user = __auth_token(request)
@@ -157,14 +167,16 @@ def user_login(request):
     email = body['email']
     password = body['password']
 
-    # login
     if email is None or password is None:
         return JsonResponse({'message': 'Email and password are required!'}, status=400)
 
     user = CustomUser.objects.get(email=email)
 
     if user.check_password(password):
-        token = jwt.encode({'email': email}, jwt_secret, algorithm='HS256')
+        token = jwt.encode({
+            'email': email, 
+            'exp': datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(hours=2) 
+            }, jwt_secret, algorithm='HS256')
         return JsonResponse({'message': 'Login successfully!', 'token': token})
     else:
         return JsonResponse({'message': 'Login failed!'}, status=401)
@@ -188,17 +200,3 @@ def user_register(request):
         return JsonResponse({'message': 'User created successfully!'})
     else:
         return JsonResponse({'message': 'User creation failed!'}, status=401)
-
-def delete_stock(request, token):
-    email = __auth_token(request)['email']
-
-    if not email:
-        return JsonResponse({'message': 'Token is required!'}, status=401)
-
-    user = CustomUser.objects.get(email=email)
-
-    if request.method == 'DELETE':
-        stock = Stock.objects.get(user=user, symbol=token)
-        stock.delete()
-
-        return JsonResponse({'message': 'Deleted successfully!'})

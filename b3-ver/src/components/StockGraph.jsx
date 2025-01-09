@@ -42,6 +42,7 @@ function StockGraph({symbol, data, limSup, limInf}) {
                 ]
             }
             gridAxis="y"
+            withDots={false}
             series={[
                 { name: 'price', color: 'blue', label: 'Cotação' },
             ]}
