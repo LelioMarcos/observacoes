@@ -20,7 +20,7 @@ app.autodiscover_tasks(['stocks'])
 app.conf.beat_schedule = {
     'run-every-afternoon': {
         'task': 'stocks.tasks.update_ativo_price',
-        'schedule': 60.0,
+        'schedule': crontab(minute="*/1"),
         'args': (),
     },
 }

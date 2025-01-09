@@ -128,15 +128,9 @@ def update_stock(request, token):
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)
 
-        symbol = body['symbol']
-        upper_limit = body['upper_limit']
-        lower_limit = body['lower_limit']
-        period = body['period']
-
-        stock.symbol = symbol
-        stock.upper_limit = upper_limit
-        stock.lower_limit = lower_limit
-        stock.period = period
+        stock.upper_limit = body['upper_limit']
+        stock.lower_limit = body['lower_limit']
+        stock.period = body['period']
         stock.save()
        
         data = {

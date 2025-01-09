@@ -24,7 +24,7 @@ function StockCard({stocks, stock, index, setStock, fetchStocks}) {
 
     const handleUpdateStockButton = (new_value, limit, index) => {
         const newStocks = [...stocks];
-        newStocks[0][limit] = new_value;
+        newStocks[index][limit] = new_value;
         console.log(newStocks);
         updateStock(newStocks, index);
     }
