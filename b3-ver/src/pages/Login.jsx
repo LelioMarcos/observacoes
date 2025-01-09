@@ -1,4 +1,4 @@
-import { TextInput, Title, Button, PasswordInput, Stack } from "@mantine/core";
+import { TextInput,Text , Title, Button, PasswordInput, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
@@ -7,6 +7,7 @@ import { useState } from "react";
 function Login() {
     const {token, tryLogin} = useAuth();
     const [loading, setLoading] = useState(false);
+    const [loginError, setLoginError] = useState('');
 
     const form = useForm({
         mode: 'uncontrolled',
@@ -14,6 +15,10 @@ function Login() {
             email: '',
             password: ''
         },
+
+        validate: {
+            email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Email inválido'), 
+        }
     });
 
     const navigate = useNavigate();
@@ -24,6 +29,7 @@ function Login() {
 
     function onSubmit(values) {
         setLoading(true);
+        setLoginError('');
         values ={
             email: values.email.trim(),
             password: values.password
@@ -35,10 +41,7 @@ function Login() {
             })
             .catch(err => {
                 setLoading(false);
-                if (err.response?.status !== 401){
-                    console.error("Login error:", err.response.data.message);
-                }
-                setError(err.response.data.message);
+                setLoginError(err.response.data.message);
             }).finally(() => {
                 setLoading(false);
             });
@@ -48,6 +51,7 @@ function Login() {
         <>
         <Title align="center">Login</Title>
         <Stack align='center' justify='center' gap={'xs'} component={'form'} onSubmit={form.onSubmit(onSubmit)}>
+            <Text align='center' c='red' fw={700}>{loginError}</Text>
             <TextInput
                 label="Email"
                 placeholder="Digite seu email"

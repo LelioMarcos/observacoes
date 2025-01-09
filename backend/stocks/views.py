@@ -168,9 +168,12 @@ def user_login(request):
     password = body['password']
 
     if email is None or password is None:
-        return JsonResponse({'message': 'Email and password are required!'}, status=400)
+        return JsonResponse({'message': 'Email e senha são obrigatórios'}, status=400)
 
-    user = CustomUser.objects.get(email=email)
+    try:
+        user = CustomUser.objects.get(email=email)
+    except CustomUser.DoesNotExist:
+        return JsonResponse({'message': 'Email ou senha incorretos'}, status=401)
 
     if user.check_password(password):
         token = jwt.encode({
@@ -179,7 +182,7 @@ def user_login(request):
             }, jwt_secret, algorithm='HS256')
         return JsonResponse({'message': 'Login successfully!', 'token': token})
     else:
-        return JsonResponse({'message': 'Login failed!'}, status=401)
+        return JsonResponse({'message': 'Email ou senha incorretos'}, status=401)
 
 def user_register(request):
     body = json.loads(request.body)
