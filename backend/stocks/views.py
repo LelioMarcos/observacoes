@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from django.contrib.auth.models import User
 import jwt
 from .tasks import send_email
-from datetime import timezone
+from datetime import timezone, datetime, timedelta
 
 load_dotenv(".env")
 jwt_secret = os.getenv("JWT_SECRET")
@@ -178,7 +178,7 @@ def user_login(request):
     if user.check_password(password):
         token = jwt.encode({
             'email': email, 
-            'exp': datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(hours=2) 
+            'exp': datetime.now(tz=timezone.utc) + timedelta(hours=2) 
             }, jwt_secret, algorithm='HS256')
         return JsonResponse({'message': 'Login successfully!', 'token': token})
     else:

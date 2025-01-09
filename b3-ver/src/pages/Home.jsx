@@ -47,7 +47,7 @@ function Home() {
       }, {
 
       }).then(() => {
-        addStock(values.symbol);
+        addStock(values.symbol.toUpperCase());
       }).catch((error) => {
         setAddError(error.response.data.message);
       }).finally(() => {
